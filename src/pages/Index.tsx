@@ -1,10 +1,10 @@
 
-import { ParasiteExperience } from "@/components/ParasiteExperience";
+import { BlobNetwork } from "@/components/BlobNetwork";
 
 const Index = () => {
   return (
-    <div className="relative min-h-screen w-full bg-black overflow-hidden">
-      <ParasiteExperience />
+    <div className="w-screen h-screen bg-black overflow-hidden">
+      <BlobNetwork />
     </div>
   );
 };
