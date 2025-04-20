@@ -1,24 +1,15 @@
 
 import { useEffect, useState, useRef } from "react";
-import { FloatingNode } from "./FloatingNode";
-import { ConnectionPath } from "./ConnectionPath";
 import { motion } from "framer-motion";
-
-interface NodePosition {
-  id: string;
-  x: number;
-  y: number;
-  z: number;
-  depth: number;
-}
+import { ParasiteNode } from "./ParasiteNode";
+import { ConnectionPath } from "./ConnectionPath";
+import { parasiteData, nodeConnections } from "@/data/parasiteData";
 
 export function ParasiteNetwork() {
-  const [nodes, setNodes] = useState<NodePosition[]>([]);
+  const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
   const [visitedNodes, setVisitedNodes] = useState<Set<string>>(new Set());
-  const [connections, setConnections] = useState<{start: string, end: string, isActive: boolean}[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isInitialized, setIsInitialized] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Track mouse movement for subtle parallax effect
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -31,166 +22,69 @@ export function ParasiteNetwork() {
     setMousePosition({ x, y });
   };
 
-  // Generate nodes with better spatial distribution
-  useEffect(() => {
-    const generateNodes = () => {
-      console.log("Generating nodes");
-      const newNodes: NodePosition[] = [];
-      const nodeCount = 24; // Increased number of nodes
-      const usedPositions: {x: number, y: number}[] = [];
-      
-      // Distribute nodes in 3D space, ensuring no overlap
-      for (let i = 0; i < nodeCount; i++) {
-        let x: number, y: number, isOverlapping: boolean;
-        const minDistance = 15; // Minimum distance between nodes (percentage of container)
-        
-        // Keep generating positions until we find one that doesn't overlap
-        do {
-          isOverlapping = false;
-          x = 15 + Math.random() * 70; // Keep nodes within 15-85% of the container
-          y = 15 + Math.random() * 70;
-          
-          // Check for overlap with existing nodes
-          for (const pos of usedPositions) {
-            const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
-            if (distance < minDistance) {
-              isOverlapping = true;
-              break;
-            }
-          }
-        } while (isOverlapping);
-        
-        usedPositions.push({ x, y });
-        
-        // Calculate z position for depth effect
-        // Distribute z values from -800 to -100 for depth perception
-        const z = -100 - Math.random() * 700;
-        
-        newNodes.push({
-          id: `node-${i}`,
-          x,
-          y,
-          z,
-          depth: i, // Each node gets a unique depth value
-        });
-      }
-      
-      setNodes(newNodes);
-      setIsInitialized(true);
-      console.log("Generated nodes:", newNodes.length);
-    };
-
-    if (!isInitialized) {
-      generateNodes();
-    }
-  }, [isInitialized]);
-
-  // Generate connections between nodes
-  useEffect(() => {
-    if (nodes.length === 0) return;
-    
-    console.log("Generating connections for", nodes.length, "nodes");
-    
-    // Create more organic connections between nodes
-    const newConnections: {start: string, end: string, isActive: boolean}[] = [];
-    
-    // Connect each node to 2-3 closest neighbors
-    nodes.forEach((node) => {
-      // Calculate distances to all other nodes
-      const distances = nodes
-        .filter(n => n.id !== node.id)
-        .map(n => ({
-          id: n.id,
-          distance: Math.sqrt(
-            Math.pow(n.x - node.x, 2) + 
-            Math.pow(n.y - node.y, 2) +
-            Math.pow(n.z - node.z, 2) / 10 // Scale z distance
-          )
-        }))
-        .sort((a, b) => a.distance - b.distance);
-      
-      // Connect to 2-3 closest nodes
-      const connectCount = 2 + Math.floor(Math.random() * 2);
-      
-      for (let i = 0; i < Math.min(connectCount, distances.length); i++) {
-        // Check if this connection already exists
-        const alreadyExists = newConnections.some(
-          conn => (conn.start === node.id && conn.end === distances[i].id) || 
-                 (conn.start === distances[i].id && conn.end === node.id)
-        );
-        
-        if (!alreadyExists) {
-          newConnections.push({
-            start: node.id,
-            end: distances[i].id,
-            isActive: visitedNodes.has(node.id) && visitedNodes.has(distances[i].id)
-          });
-        }
-      }
-    });
-    
-    setConnections(newConnections);
-    console.log("Generated connections:", newConnections.length);
-  }, [nodes, visitedNodes]);
-
-  const handleNodeNavigate = (nodeId: string) => {
-    setVisitedNodes(prev => new Set([...prev, nodeId]));
-    
-    // Update connections
-    setConnections(prev => 
-      prev.map(conn => ({
-        ...conn,
-        isActive: (conn.start === nodeId || conn.end === nodeId) ? true : conn.isActive
-      }))
-    );
+  // Reset the experience
+  const handleReset = () => {
+    setActiveNodeId(null);
+    setVisitedNodes(new Set());
   };
 
-  // Debugging purposes - add a simple node if none are shown
-  if (nodes.length === 0 && isInitialized) {
-    console.log("No nodes generated, something went wrong");
-  }
+  // Navigate to the next node
+  const handleNodeNavigate = (nodeId: string) => {
+    setActiveNodeId(nodeId);
+    setVisitedNodes(prev => {
+      const newSet = new Set(prev);
+      newSet.add(nodeId);
+      return newSet;
+    });
+  };
+
+  // Check if connections are active based on visited nodes
+  const isConnectionActive = (start: string, end: string) => {
+    return visitedNodes.has(start) || visitedNodes.has(end);
+  };
 
   return (
     <motion.div 
       ref={containerRef}
-      className="relative w-full h-screen bg-black overflow-hidden"
-      style={{ 
-        perspective: '1200px',
-        transformStyle: 'preserve-3d'
-      }}
+      className="relative w-full h-screen overflow-hidden bg-black"
       onMouseMove={handleMouseMove}
-      animate={{
-        backgroundPosition: `${mousePosition.x * 10}px ${mousePosition.y * 10}px`
+      style={{
+        perspective: '1200px',
       }}
-      transition={{ type: "spring", damping: 50 }}
     >
-      {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-[#00FF00] text-xl">
-          Loading network...
-        </div>
-      )}
-      
-      {nodes.map((node) => (
-        <FloatingNode
+      {/* Rendering all parasite nodes */}
+      {parasiteData.map((node, index) => (
+        <ParasiteNode
           key={node.id}
           id={node.id}
-          x={node.x - mousePosition.x * 2} // Subtle parallax effect
-          y={node.y - mousePosition.y * 2}
-          z={node.z}
-          depth={node.depth}
-          isVisited={visitedNodes.has(node.id)}
-          onNavigate={handleNodeNavigate}
+          title={node.title}
+          description={node.description}
+          image={node.image}
+          x={node.x - mousePosition.x * 5} // Apply subtle parallax effect
+          y={node.y - mousePosition.y * 5}
+          zIndex={1000 - index}
+          onNavigateNext={() => handleNodeNavigate(node.id)}
+          isActive={activeNodeId === node.id || activeNodeId === null}
         />
       ))}
-      
-      {connections.map((connection, index) => (
+
+      {/* Rendering connections between nodes */}
+      {nodeConnections.map((connection, index) => (
         <ConnectionPath
-          key={`${connection.start}-${connection.end}-${index}`}
+          key={`connection-${index}`}
           startNodeId={connection.start}
           endNodeId={connection.end}
-          isActive={connection.isActive}
+          isActive={isConnectionActive(connection.start, connection.end)}
         />
       ))}
+
+      {/* Reset button */}
+      <button 
+        onClick={handleReset} 
+        className="fixed bottom-5 right-5 z-50 bg-transparent border border-[#00FF00] text-[#00FF00] px-4 py-2 rounded neon-text"
+      >
+        Reset View
+      </button>
     </motion.div>
   );
 }

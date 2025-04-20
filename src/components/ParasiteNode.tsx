@@ -41,13 +41,14 @@ export function ParasiteNode({
   return (
     <>
       <motion.div
-        className={`neon-box node-hover animate-float absolute ${isActive ? 'animate-pulse-neon' : ''}`}
+        className={`neon-box node-hover absolute ${isActive ? 'animate-pulse-neon' : ''}`}
         style={{
           left: `${x}%`,
           top: `${y}%`,
           width: '180px',
           height: '180px',
           zIndex: zIndex,
+          position: 'absolute',
         }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}

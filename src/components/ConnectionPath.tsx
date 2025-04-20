@@ -97,6 +97,7 @@ export function ConnectionPath({
         top: `${pathDetails.top}px`,
         transform: `rotate(${pathDetails.angle}deg)`,
         transformOrigin: "0 0",
+        zIndex: 50,
       }}
       initial={{ opacity: 0 }}
       animate={{ 
@@ -105,16 +106,16 @@ export function ConnectionPath({
       transition={{ duration: 0.5 }}
     >
       <motion.div
-        className="h-[1px] w-full" 
+        className="h-[2px] w-full" 
         style={{
-          background: "linear-gradient(90deg, rgba(0,255,0,0) 0%, rgba(0,255,0,0.6) 50%, rgba(0,255,0,0) 100%)",
-          boxShadow: "0 0 8px rgba(0, 255, 0, 0.5)"
+          background: "linear-gradient(90deg, rgba(0,255,0,0) 0%, rgba(0,255,0,0.8) 50%, rgba(0,255,0,0) 100%)",
+          boxShadow: "0 0 8px rgba(0, 255, 0, 0.7)"
         }}
         animate={{
           opacity: [0.4, 1, 0.4],
         }}
         transition={{
-          duration: 3,
+          duration: 2,
           repeat: Infinity,
           repeatType: "reverse"
         }}

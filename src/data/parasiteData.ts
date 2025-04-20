@@ -31,6 +31,7 @@ export interface NodeConnection {
 
 // Define the parasite data
 export const parasiteData: ParasiteNode[] = [
+  // Origin Layer (Closest to viewer)
   {
     id: "salmonella-origin",
     title: "Salmonella Origin",
@@ -67,13 +68,14 @@ export const parasiteData: ParasiteNode[] = [
     mapX: 20,
     mapY: 50
   },
+  // Water Routes & Infrastructure Layer (Middle depth)
   {
     id: "water-infiltration",
     title: "Water Infiltration Point",
     description: "This crucial junction is where parasites first enter the municipal water system. Aging infrastructure, including cracked pipes and outdated filtration systems, creates vulnerability points.",
     image: "/lovable-uploads/f6707e57-be57-46e2-a9f9-afd671d66b9f.png",
     type: "salmonella",
-    x: 50,
+    x: 45,
     y: 40,
     z: -300,
     mapX: 35,
@@ -91,6 +93,19 @@ export const parasiteData: ParasiteNode[] = [
     mapX: 55,
     mapY: 40
   },
+  {
+    id: "water-storage",
+    title: "Neighborhood Water Storage",
+    description: "Communal cisterns and rooftop water tanks are breeding grounds for parasites. The irregular water supply forces residents to store water, creating stagnant conditions ideal for microbial growth.",
+    image: "/lovable-uploads/0b7538bb-1623-46cf-b294-835fcdf8cf7c.png",
+    type: "vibrio_cholerae",
+    x: 35,
+    y: 55,
+    z: -350,
+    mapX: 40,
+    mapY: 45
+  },
+  // Human Exposure Layer (Deepest)
   {
     id: "residential-area",
     title: "Residential Water Access",
@@ -119,10 +134,23 @@ export const parasiteData: ParasiteNode[] = [
 
 // Define the connections between nodes
 export const nodeConnections: NodeConnection[] = [
+  // Origin to infiltration connections
   { start: "salmonella-origin", end: "water-infiltration" },
   { start: "shigella-origin", end: "water-infiltration" },
   { start: "vibrio-origin", end: "water-infiltration" },
+  
+  // Infrastructure connections
   { start: "water-infiltration", end: "distribution-system" },
+  { start: "water-infiltration", end: "water-storage" },
+  { start: "distribution-system", end: "water-storage" },
+  
+  // Human exposure connections
   { start: "distribution-system", end: "residential-area" },
-  { start: "residential-area", end: "human-consumption" }
+  { start: "water-storage", end: "residential-area" },
+  { start: "residential-area", end: "human-consumption" },
+  
+  // Cyclic connections (to ensure no endpoints)
+  { start: "human-consumption", end: "salmonella-origin" },
+  { start: "human-consumption", end: "shigella-origin" },
+  { start: "human-consumption", end: "vibrio-origin" }
 ];
