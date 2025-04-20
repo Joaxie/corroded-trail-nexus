@@ -42,7 +42,7 @@ export function BlobConnection({
         x2={`calc(${tx}% )`}
         y2={`calc(${ty}% )`}
         stroke="#00FF00"
-        strokeWidth="3"
+        strokeWidth="1.5" // Thinner stroke
         opacity="0.95"
         // No classes, no animation, no filter
         style={{

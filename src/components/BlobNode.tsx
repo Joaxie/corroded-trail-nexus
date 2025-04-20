@@ -42,16 +42,16 @@ export function BlobNode({
         ref={nodeRef}
         tabIndex={0}
         onClick={onClick}
-        className={`absolute cursor-pointer group select-none outline-none focus:outline-none border-[2.5px]`}
+        className={`absolute cursor-pointer group select-none outline-none focus:outline-none border-[1.5px]`} // Thinner border
         style={{
           left: `calc(${node.x}% - ${size / 2}px)`,
           top: `calc(${node.y}% - ${size / 2}px)`,
           width: size,
           height: size,
-          border: "2.5px solid #00FF00",
+          border: "1.5px solid #00FF00", // Thinner border
           background: "transparent",
           borderRadius: 0,
-          outline: selected ? "#00FF00 solid 2px" : "",
+          outline: selected ? "#00FF00 solid 1.5px" : "",
           transition: "none",
           display: "flex",
           alignItems: "center",
