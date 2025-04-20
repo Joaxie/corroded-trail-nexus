@@ -17,6 +17,9 @@ export function ConnectionPath({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Skip processing for inactive connections
+    if (!isActive) return;
+    
     const updatePath = () => {
       if (!pathRef.current) return;
 
@@ -46,7 +49,7 @@ export function ConnectionPath({
           pathRef.current.style.transform = `rotate(${angle}deg)`;
           pathRef.current.style.transformOrigin = "0 0";
           
-          // Make connection visible if both nodes are in viewport
+          // Only check visibility if we need to
           const isStartVisible = startRect.top < window.innerHeight && 
                                 startRect.bottom > 0 && 
                                 startRect.left < window.innerWidth && 
@@ -68,14 +71,14 @@ export function ConnectionPath({
     // Update on window resize
     window.addEventListener("resize", updatePath);
     
-    // Update periodically in case of dynamic layouts
-    const interval = setInterval(updatePath, 100);
+    // Update periodically but at a reduced rate to improve performance
+    const interval = setInterval(updatePath, 200);
 
     return () => {
       window.removeEventListener("resize", updatePath);
       clearInterval(interval);
     };
-  }, [startNodeId, endNodeId]);
+  }, [startNodeId, endNodeId, isActive]);
 
   if (!isActive || !isVisible) return null;
 

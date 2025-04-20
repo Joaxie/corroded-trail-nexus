@@ -3,7 +3,7 @@ import { ParasiteNetwork } from "@/components/ParasiteNetwork";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black w-full h-full">
       <ParasiteNetwork />
     </div>
   );
