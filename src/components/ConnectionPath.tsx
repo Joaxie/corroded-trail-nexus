@@ -15,6 +15,12 @@ export function ConnectionPath({
 }: ConnectionPathProps) {
   const pathRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [pathDetails, setPathDetails] = useState({
+    width: 0,
+    left: 0,
+    top: 0,
+    angle: 0,
+  });
 
   useEffect(() => {
     // Skip processing for inactive connections
@@ -41,27 +47,26 @@ export function ConnectionPath({
         const distance = Math.sqrt(dx * dx + dy * dy);
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-        // Set the line's properties
-        if (pathRef.current) {
-          pathRef.current.style.width = `${distance}px`;
-          pathRef.current.style.left = `${startX}px`;
-          pathRef.current.style.top = `${startY}px`;
-          pathRef.current.style.transform = `rotate(${angle}deg)`;
-          pathRef.current.style.transformOrigin = "0 0";
+        // Update state for the path
+        setPathDetails({
+          width: distance,
+          left: startX,
+          top: startY,
+          angle: angle,
+        });
           
-          // Only check visibility if we need to
-          const isStartVisible = startRect.top < window.innerHeight && 
-                                startRect.bottom > 0 && 
-                                startRect.left < window.innerWidth && 
-                                startRect.right > 0;
-                              
-          const isEndVisible = endRect.top < window.innerHeight && 
-                              endRect.bottom > 0 && 
-                              endRect.left < window.innerWidth && 
-                              endRect.right > 0;
-          
-          setIsVisible(isStartVisible && isEndVisible);
-        }
+        // Check visibility
+        const isStartVisible = startRect.top < window.innerHeight && 
+                              startRect.bottom > 0 && 
+                              startRect.left < window.innerWidth && 
+                              startRect.right > 0;
+        
+        const isEndVisible = endRect.top < window.innerHeight && 
+                            endRect.bottom > 0 && 
+                            endRect.left < window.innerWidth && 
+                            endRect.right > 0;
+        
+        setIsVisible(isStartVisible && isEndVisible);
       }
     };
 
@@ -72,7 +77,7 @@ export function ConnectionPath({
     window.addEventListener("resize", updatePath);
     
     // Update periodically but at a reduced rate to improve performance
-    const interval = setInterval(updatePath, 200);
+    const interval = setInterval(updatePath, 300);
 
     return () => {
       window.removeEventListener("resize", updatePath);
@@ -86,6 +91,13 @@ export function ConnectionPath({
     <motion.div
       ref={pathRef}
       className="absolute pointer-events-none"
+      style={{
+        width: `${pathDetails.width}px`,
+        left: `${pathDetails.left}px`,
+        top: `${pathDetails.top}px`,
+        transform: `rotate(${pathDetails.angle}deg)`,
+        transformOrigin: "0 0",
+      }}
       initial={{ opacity: 0 }}
       animate={{ 
         opacity: 1,

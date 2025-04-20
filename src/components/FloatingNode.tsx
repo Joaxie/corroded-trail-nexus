@@ -67,7 +67,9 @@ export function FloatingNode({
           top: `${y}%`,
           width: '100px',
           height: '100px',
-          zIndex: depth,
+          zIndex: depth + 1, // Ensure it has a valid z-index
+          position: 'absolute', // Make sure it's positioned absolutely
+          background: 'transparent',
         }}
         initial={{ 
           opacity: 0, 

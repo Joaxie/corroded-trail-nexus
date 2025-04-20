@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { FloatingNode } from "./FloatingNode";
 import { ConnectionPath } from "./ConnectionPath";
@@ -17,6 +18,7 @@ export function ParasiteNetwork() {
   const [connections, setConnections] = useState<{start: string, end: string, isActive: boolean}[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Track mouse movement for subtle parallax effect
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -32,6 +34,7 @@ export function ParasiteNetwork() {
   // Generate nodes with better spatial distribution
   useEffect(() => {
     const generateNodes = () => {
+      console.log("Generating nodes");
       const newNodes: NodePosition[] = [];
       const nodeCount = 24; // Increased number of nodes
       const usedPositions: {x: number, y: number}[] = [];
@@ -73,14 +76,20 @@ export function ParasiteNetwork() {
       }
       
       setNodes(newNodes);
+      setIsInitialized(true);
+      console.log("Generated nodes:", newNodes.length);
     };
 
-    generateNodes();
-  }, []);
+    if (!isInitialized) {
+      generateNodes();
+    }
+  }, [isInitialized]);
 
   // Generate connections between nodes
   useEffect(() => {
     if (nodes.length === 0) return;
+    
+    console.log("Generating connections for", nodes.length, "nodes");
     
     // Create more organic connections between nodes
     const newConnections: {start: string, end: string, isActive: boolean}[] = [];
@@ -121,6 +130,7 @@ export function ParasiteNetwork() {
     });
     
     setConnections(newConnections);
+    console.log("Generated connections:", newConnections.length);
   }, [nodes, visitedNodes]);
 
   const handleNodeNavigate = (nodeId: string) => {
@@ -134,6 +144,11 @@ export function ParasiteNetwork() {
       }))
     );
   };
+
+  // Debugging purposes - add a simple node if none are shown
+  if (nodes.length === 0 && isInitialized) {
+    console.log("No nodes generated, something went wrong");
+  }
 
   return (
     <motion.div 
@@ -149,6 +164,12 @@ export function ParasiteNetwork() {
       }}
       transition={{ type: "spring", damping: 50 }}
     >
+      {nodes.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center text-[#00FF00] text-xl">
+          Loading network...
+        </div>
+      )}
+      
       {nodes.map((node) => (
         <FloatingNode
           key={node.id}
