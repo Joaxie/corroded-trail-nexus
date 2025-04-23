@@ -1,3 +1,4 @@
+
 #root {
   width: 100%;
   height: 100vh;
@@ -22,27 +23,33 @@ html, body, #root, .min-h-screen {
   width: 100%;
 }
 
-/* Futuristic scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Override dialog styling to make it square with green borders */
+.react-flow__node, 
+.react-flow__edge, 
+.react-flow__connection-path,
+.react-flow__handle {
+  border-radius: 0 !important;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+/* Remove all rounded corners from dialogs */
+[role="dialog"] {
+  border-radius: 0 !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #00FF00;
-  border-radius: 3px;
+[role="dialog"] * {
+  border-radius: 0 !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #00CC00;
+.react-flow__node {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Neon glow for buttons */
-button:focus {
-  outline: none;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+/* Remove any drop shadows or glows */
+* {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  transition: none !important;
 }

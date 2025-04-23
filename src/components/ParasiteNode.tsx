@@ -1,86 +1,32 @@
 
-import { useState } from "react";
-import { Dialog } from "@/components/ui/dialog";
-import { DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
+import { ParasiteNode as ParasiteNodeType } from "@/data/parasiteData";
 
 interface ParasiteNodeProps {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  x: number;
-  y: number;
-  zIndex: number;
-  onNavigateNext: () => void;
-  isActive: boolean;
+  node: ParasiteNodeType;
+  onClick: () => void;
 }
 
-export function ParasiteNode({
-  id,
-  title,
-  description,
-  image,
-  x,
-  y,
-  zIndex,
-  onNavigateNext,
-  isActive,
-}: ParasiteNodeProps) {
-  const [showInfo, setShowInfo] = useState(false);
+export function ParasiteNode({ node, onClick }: ParasiteNodeProps) {
+  // Calculate size based on depth (closer = larger)
+  const baseSize = 80; // base size in pixels
+  const sizeMultiplier = 1 - (node.z * 0.15); // reduce size by depth
+  const size = Math.max(40, baseSize * sizeMultiplier); // minimum size of 40px
   
-  const handleClick = () => {
-    if (!showInfo) {
-      setShowInfo(true);
-    } else {
-      setShowInfo(false);
-      onNavigateNext();
-    }
-  };
-
   return (
-    <>
-      <motion.div
-        className={`neon-box node-hover absolute ${isActive ? 'animate-pulse-neon' : ''}`}
-        style={{
-          left: `${x}%`,
-          top: `${y}%`,
-          width: '180px',
-          height: '180px',
-          zIndex: zIndex,
-          position: 'absolute',
-        }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        data-node-id={id}
-      >
-        <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          <img src={image} alt={title} className="w-full h-full object-cover opacity-80" />
-        </div>
-        {isActive && (
-          <div className="plus-sign" onClick={handleClick}>+</div>
-        )}
-      </motion.div>
-
-      <Dialog open={showInfo} onOpenChange={setShowInfo}>
-        <DialogContent className="bg-black border border-[#00FF00] max-w-md neon-box animate-pulse-neon">
-          <DialogHeader>
-            <DialogTitle className="neon-text text-xl font-mono">{title}</DialogTitle>
-          </DialogHeader>
-          <div className="text-white font-mono text-sm my-4">
-            {description}
-          </div>
-          <div className="flex justify-end">
-            <button 
-              onClick={onNavigateNext} 
-              className="neon-text border border-[#00FF00] px-4 py-2 rounded hover:bg-[#00FF00] hover:bg-opacity-20 font-mono"
-            >
-              Continue Journey →
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    <div
+      className="absolute cursor-pointer border border-[#00FF00] flex items-center justify-center"
+      style={{
+        left: `${node.x}%`,
+        top: `${node.y}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        transform: `translate(-50%, -50%)`,
+        zIndex: 100 - node.z, // Higher z-index for closer nodes
+      }}
+      onClick={onClick}
+      data-node-id={node.id}
+    >
+      <span className="text-[#00FF00] text-2xl">+</span>
+    </div>
   );
 }

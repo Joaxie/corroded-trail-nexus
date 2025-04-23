@@ -3,35 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Remove all glows, animations, and rounded edges for node/connection visuals */
+/* Remove all glows, animations, and rounded edges */
 html, body, #root {
   width: 100vw;
   height: 100vh;
   background: #000;
   overflow: hidden;
 }
+
 body {
   font-family: 'JetBrains Mono', 'Menlo', monospace;
   color: #00FF00;
 }
-/* Neon text and glow are REMOVED. Use bright green text for important info. */
-.neon-text {
-  color: #00FF00;
-  text-shadow: none;
-}
-.neon-box {
-  box-shadow: none;
-  border-color: #00ff00 !important;
-  border-radius: 0 !important;
-}
-@keyframes blink-glow { }
-.animate-blink-glow {}
-@keyframes connection-fade { }
-.connection-blink {}
-@keyframes fade-in-k { }
-.animate-fade-in {}
 
-/* All node and modal borders perfectly square */
+/* All borders perfectly square */
 * {
   border-radius: 0 !important;
+}
+
+/* Remove all animations and transitions */
+* {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Override dialog styling */
+[data-radix-popper-content-wrapper] [role="dialog"] {
+  background-color: #000 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+.radix-themes {
+  --default-border-radius: 0px !important;
 }
