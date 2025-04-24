@@ -18,6 +18,11 @@ export interface ParasiteNode {
   y: number; // Position Y (percentage of screen)
   z: number; // Depth layer (0 = closest, higher = deeper)
   connections: string[]; // IDs of connected nodes
+  // For map view positioning
+  mapX?: number;
+  mapY?: number;
+  // For card view
+  title?: string;
 }
 
 // Define our parasite nodes
@@ -382,3 +387,18 @@ export const parasiteNodes: ParasiteNode[] = [
     connections: ["giardia-1"]
   }
 ];
+
+// Create parasiteData and nodeConnections exports for components using these names
+export const parasiteData = parasiteNodes.map(node => ({
+  ...node,
+  title: node.name, // Map name to title for components expecting title property
+}));
+
+// Create connection objects from the node connection data
+export const nodeConnections = parasiteNodes.flatMap(node => 
+  node.connections.map(targetId => ({
+    start: node.id,
+    end: targetId
+  }))
+);
+

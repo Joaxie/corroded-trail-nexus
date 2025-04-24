@@ -18,7 +18,7 @@ export function NodeConnection({ sourceNode, targetNode }: NodeConnectionProps) 
         x2={`${targetNode.x}%`}
         y2={`${targetNode.y}%`}
         stroke="#00FF00"
-        strokeWidth="1.5"
+        strokeWidth="1"
       />
     </svg>
   );
