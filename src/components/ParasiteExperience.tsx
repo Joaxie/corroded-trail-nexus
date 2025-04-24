@@ -40,6 +40,11 @@ export function ParasiteExperience() {
     return activeNodeIds.includes(startId) && activeNodeIds.includes(endId);
   };
 
+  // Empty click handler for nodes that aren't meant to navigate
+  const handleEmptyClick = () => {
+    // This is a placeholder function to satisfy the onClick prop requirement
+  };
+
   return (
     <div 
       className="parasite-container"
@@ -61,8 +66,7 @@ export function ParasiteExperience() {
         className="fixed top-8 left-0 right-0 text-center neon-text text-4xl font-mono uppercase tracking-wider"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration:
- 0.7 }}
+        transition={{ delay: 0.5, duration: 0.7 }}
       >
         RASTRO CORROSIVO
       </motion.h1>
@@ -84,6 +88,8 @@ export function ParasiteExperience() {
             return (
               <ParasiteNode
                 key={node.id}
+                node={node} // Add the required node prop
+                onClick={handleEmptyClick} // Add the required onClick prop
                 id={node.id}
                 title={node.title}
                 description={node.description}
